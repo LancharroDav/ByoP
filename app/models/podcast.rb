@@ -1,7 +1,7 @@
 class Podcast < ApplicationRecord
   has_many :episodes
 
-  def self.get_feed(url)
+  def self.get_podcast(url)
     xml = HTTParty.get(url).body
     feed = Feedjira.parse(xml)
 
