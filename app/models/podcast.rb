@@ -1,4 +1,5 @@
 class Podcast < ApplicationRecord
+  has_many :episodes
 
   def self.get_feed(url)
     xml = HTTParty.get(url).body
@@ -20,5 +21,27 @@ class Podcast < ApplicationRecord
                 }
 
     Podcast.new(all_params).save
+  end
+
+  def get_episodes(url)
+    xml = HTTParty.get(url).body
+    feed = Feedjira.parse(xml)
+
+    feed.entries.each do |ep|
+      title = ep.title
+      number = ep.itunes_episode
+      description = ep.itunes_summary #ep.description didn't work
+      audio_length = ep.itunes_duration
+      audio_file_url = '' #ep.link didn't work
+
+      all_params = {title: title,
+                    number: number,
+                    description: description,
+                    audio_length_seconds: audio_length,
+                    audio_file_url: audio_file_url
+                  }
+      
+      self.episodes.new(all_params).save
+    end
   end
 end
